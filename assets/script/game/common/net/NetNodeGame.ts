@@ -13,22 +13,20 @@ import { netConfig } from "./NetConfig";
 export class NetNodeGame extends NetNode {
     private isCompress: boolean = false;
 
-    public req(action: string, method: string, data: any, rspObject: CallbackObject, showTips: boolean = true, force: boolean = false) {
+    public req(msgName:string, data: any, rspObject: CallbackObject, showTips: boolean = true, force: boolean = false) {
         let protocol: IRequestProtocol = {
-            action: action,
-            method: method,
-            data: JSON.stringify(data),
+            msgName: msgName,
+            data: data,
             isCompress: this.isCompress,
             channelid: netConfig.channelid
         }
         return this.request(protocol, rspObject, showTips, force);
     }
 
-    public reqUnique(action: string, method: string, data: any, rspObject: CallbackObject, showTips: boolean = true, force: boolean = false): boolean {
+    public reqUnique(msgName:string, data: any, rspObject: CallbackObject, showTips: boolean = true, force: boolean = false): boolean {
         let protocol: IRequestProtocol = {
-            action: action,
-            method: method,
-            data: JSON.stringify(data),
+            msgName: msgName,
+            data: data,
             isCompress: this.isCompress,
             channelid: netConfig.channelid
         }

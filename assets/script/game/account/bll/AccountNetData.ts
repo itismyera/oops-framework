@@ -13,6 +13,12 @@ import { netConfig } from "../../common/net/NetConfig";
 import { Role } from "../../role/Role";
 import { Account } from "../Account";
 import { AccountModelComp } from "../model/AccountModelComp";
+import { netChannel } from "../../common/net/NetChannelManager";
+// import * as protobuf from "../../../../../extensions/oops-plugin-framework/assets/libs/protobuf/compiled";
+import PBEncoder from "../../../../../extensions/oops-plugin-framework/assets/libs/network/PBEncoder";
+import PBDecoder from "../../../../../extensions/oops-plugin-framework/assets/libs/network/PBDecoder";
+import { NetProtocolProtobuf } from "../../../../../extensions/oops-plugin-framework/assets/libs/network/NetProtocolProtobuf";
+import { PBMsg } from "../../../../../extensions/oops-plugin-framework/assets/libs/network/PBMsg";
 
 /** 请求玩家游戏数据 */
 @ecs.register('AccountNetData')
@@ -27,6 +33,8 @@ export class AccountNetDataSystem extends ecs.ComblockSystem implements ecs.IEnt
     }
 
     entityEnter(e: Account): void {
+
+        PBMsg.getInstance().RegisterProtoMsg();
         var params: any = {
             playerId: netConfig.dbid,
             sessionKey: netConfig.sessionKey,
@@ -46,19 +54,38 @@ export class AccountNetDataSystem extends ecs.ComblockSystem implements ecs.IEnt
             }
         }
         // 请求登录游戏获取角色数据
-        // netChannel.game.req("LoginAction", "loadPlayer", params, onComplete);
+        // netChannel.game.req("LoginAction", "loadPlayer", params , onComplete);
+
+        //构造一个消息
+        // let nProtoID = tutorial.MsgType.PING;
+        // //消息体构造
+        // let c2s = new tutorial.C2S();
+        // c2s.timestamp = new Date().getTime(); 
+        // let c2sMsg =  new tutorial.C2SMsg();
+        // c2sMsg.c2s = c2s;
+        // let bodyBuffer = tutorial.C2SMsg.encode(c2sMsg).finish();
+        // //消息体封装
+        // let fcMsg = new PBEncoder().encode(nProtoID,bodyBuffer);
+        // netChannel.game.req("C2S", fcMsg, onComplete);
+
+
+        let protoData = PBMsg.getInstance().Marshal("ReqLogin", {token:"sss"});
+        let msgID = PBMsg.getInstance().MsgID("ReqLogin");
+        let data = new PBEncoder().encode(msgID,protoData);
+        let fullName = PBMsg.getInstance().fullName("ReqLogin");
+        netChannel.game.req("ReqLogin", data, onComplete);
 
         // 离线测试代码开始
-        var data = {
-            id: 1,
-            name: "Oops",
-            power: 10,
-            agile: 10,
-            physical: 10,
-            lv: 1,
-            jobId: 1
-        }
-        onComplete.callback(data);
+        // var data = {
+        //     id: 1,
+        //     name: "Oops",
+        //     power: 10,
+        //     agile: 10,
+        //     physical: 10,
+        //     lv: 1,
+        //     jobId: 1
+        // }
+        // onComplete.callback(data);
         // 离线测试代码结束
 
         e.remove(AccountNetDataComp);
@@ -98,7 +125,7 @@ export class AccountNetDataSystem extends ecs.ComblockSystem implements ecs.IEnt
 
     /** 设置本地存储的用户标识 */
     private setLocalStorage(uid: number) {
-        oops.storage.setUser(uid);
+        oops.storage.setUser(uid.toString());
         oops.storage.set("account", uid);
     }
 }

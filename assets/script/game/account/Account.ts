@@ -10,6 +10,7 @@ import { ecs } from "../../../../extensions/oops-plugin-framework/assets/libs/ec
 import { GameEvent } from "../common/config/GameEvent";
 import { AccountNetDataComp, AccountNetDataSystem } from "./bll/AccountNetData";
 import { AccountModelComp } from "./model/AccountModelComp";
+import { netChannel } from "../common/net/NetChannelManager";
 
 /**
  * 账号模块
@@ -52,11 +53,11 @@ export class Account extends ecs.Entity {
 
     /** 连接游戏服务器 */
     connect() {
-        // netChannel.gameCreate();
-        // netChannel.gameConnect();
+        netChannel.gameCreate();
+        netChannel.gameConnect();
 
         // 无网状态下测试代码，有网络时会通过触发网络连接成功事件对接后续流程
-        oops.message.dispatchEvent(GameEvent.GameServerConnected)
+        // oops.message.dispatchEvent(GameEvent.GameServerConnected)
     }
 
     /** 获取玩家信息 */
